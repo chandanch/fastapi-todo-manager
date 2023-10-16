@@ -3,7 +3,7 @@ App
 """
 
 from typing import Annotated
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Path
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -35,7 +35,10 @@ async def get_todos(db: DBDependency):
 
 
 @app.get("/todos/{todo_id}")
-async def get_todo_by_id(db: DBDependency, todo_id: int):
+async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
+    """
+    Get Todo By ID
+    """
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is not None:
         return JSONResponse(status_code=200, content=jsonable_encoder(todo))
