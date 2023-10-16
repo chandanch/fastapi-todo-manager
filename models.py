@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base
+from database import Base, db_engine
 
 
 class Todo(Base):
@@ -13,3 +13,7 @@ class Todo(Base):
     description = Column(String)
     priority = Column(Integer)
     is_complete = Column(Boolean, default=False)
+
+
+# create database and tables
+Base.metadata.create_all(db_engine)
