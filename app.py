@@ -25,4 +25,7 @@ async def health_check():
 
 @app.get("/todos")
 async def get_todos(db: DBDependency):
+    """
+    Get Todos
+    """
     return db.query(Todo).all()
