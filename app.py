@@ -66,3 +66,27 @@ async def create_todo(db: DBDependency, todo_request: TodoCreate):
         status_code=201,
         content=jsonable_encoder(todo),
     )
+
+
+@app.put("/todos/{todo_id}")
+async def update_todo(
+    db: DBDependency, todo_request: TodoCreate, todo_id: int = Path(gt=0)
+):
+    # get todo by id
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+
+    if todo is None:
+        raise HTTPException(
+            status_code=404, detail={"error": f"Todo with {todo_id} not found"}
+        )
+
+    # Update data
+    todo.description = todo_request.description
+    todo.title = todo_request.title
+    todo.priority = todo_request.priority
+    todo.is_complete = todo_request.is_complete
+
+    db.add(todo)
+    db.commit()
+
+    return JSONResponse(status_code=200, content={"status": "Updated Todo"})
