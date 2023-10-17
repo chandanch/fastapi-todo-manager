@@ -8,7 +8,6 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException
 from sqlalchemy.orm import Session
-import json
 
 
 from database import get_db
@@ -54,6 +53,9 @@ async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
 
 @app.post("/todos")
 async def create_todo(db: DBDependency, todo_request: TodoCreate):
+    """
+    Create todo item
+    """
     todo = Todo(**todo_request.model_dump())
 
     db.add(todo)
