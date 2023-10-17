@@ -1,16 +1,20 @@
 """
 App
 """
-
 from typing import Annotated
+
 from fastapi import Depends, FastAPI, Path
-from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException
+from sqlalchemy.orm import Session
+import json
+
 
 from database import get_db
 from models import Todo
+from schemas import TodoCreate
+
 
 app = FastAPI()
 
@@ -46,3 +50,17 @@ async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
         raise HTTPException(
             status_code=404, detail={"error": f"Todo with {todo_id} not found"}
         )
+
+
+@app.post("/todos")
+async def create_todo(db: DBDependency, todo_request: TodoCreate):
+    todo = Todo(**todo_request.model_dump())
+
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
+
+    return JSONResponse(
+        status_code=201,
+        content=jsonable_encoder(todo),
+    )
