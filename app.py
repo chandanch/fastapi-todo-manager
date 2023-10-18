@@ -3,7 +3,7 @@ App
 """
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Path
+from fastapi import Depends, FastAPI, Path, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from starlette.exceptions import HTTPException
@@ -29,7 +29,7 @@ async def health_check():
     return {"status": "OK", "message": "Up & Running!"}
 
 
-@app.get("/todos")
+@app.get("/todos", status_code=status.HTTP_200_OK)
 async def get_todos(db: DBDependency):
     """
     Get Todos
@@ -44,10 +44,13 @@ async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
     """
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if todo is not None:
-        return JSONResponse(status_code=200, content=jsonable_encoder(todo))
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content=jsonable_encoder(todo)
+        )
     else:
         raise HTTPException(
-            status_code=404, detail={"error": f"Todo with {todo_id} not found"}
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": f"Todo with {todo_id} not found"},
         )
 
 
@@ -72,12 +75,16 @@ async def create_todo(db: DBDependency, todo_request: TodoCreate):
 async def update_todo(
     db: DBDependency, todo_request: TodoCreate, todo_id: int = Path(gt=0)
 ):
+    """
+    Update todo item
+    """
     # get todo by id
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
 
     if todo is None:
         raise HTTPException(
-            status_code=404, detail={"error": f"Todo with {todo_id} not found"}
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": f"Todo with {todo_id} not found"},
         )
 
     # Update data
