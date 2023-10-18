@@ -97,3 +97,24 @@ async def update_todo(
     db.commit()
 
     return JSONResponse(status_code=200, content={"status": "Updated Todo"})
+
+
+@app.delete("/todos/{todo_id}")
+async def delete_todo(db: DBDependency, todo_id: int = Path(gt=0)):
+    """
+    Delete todo item
+    """
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+
+    if todo is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": f"Todo with {todo_id} not found"},
+        )
+    else:
+        db.query(Todo).filter(Todo.id == todo_id).delete()
+        db.commit()
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"status": "Deleted Successfully"}
+    )
