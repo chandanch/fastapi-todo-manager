@@ -15,7 +15,13 @@ from models import Todo
 from schemas import TodoCreate
 
 
-app = FastAPI()
+app = FastAPI(
+    title="Todo Manager",
+    description="Todo API helps you manage awesome todos. 🚀",
+    version="1.1.0",
+    contact={"name": "chandanch"},
+    summary="Mange Todos Easily",
+)
 
 
 DBDependency = Annotated[Session, Depends(get_db)]
