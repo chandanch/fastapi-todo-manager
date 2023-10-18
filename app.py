@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Todo
 from schemas import TodoCreate
+from router import auth, healthcheck
 
 
 app = FastAPI(
@@ -26,13 +27,8 @@ app = FastAPI(
 
 DBDependency = Annotated[Session, Depends(get_db)]
 
-
-@app.get("/healthcheck")
-async def health_check():
-    """
-    Health Check
-    """
-    return {"status": "OK", "message": "Up & Running!"}
+app.include_router(router=auth.router)
+app.include_router(router=healthcheck.router)
 
 
 @app.get("/todos", status_code=status.HTTP_200_OK)
