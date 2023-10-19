@@ -7,6 +7,7 @@ name = "pypi"
 uvicorn = {extras = ["standard"], version = "*"}
 fastapi = "*"
 sqlalchemy = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
 
 [dev-packages]
 

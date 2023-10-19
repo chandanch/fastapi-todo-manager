@@ -1,8 +1,12 @@
 from fastapi import APIRouter
+from passlib.context import CryptContext
+
 from models import User
 from schemas import UserCreate
 
 router = APIRouter()
+
+bcrypt = CryptContext(schemes=["bcrypt"])
 
 
 @router.get("/auth")
@@ -25,7 +29,7 @@ async def create_user(new_user: UserCreate):
         last_name=new_user.last_name,
         role=new_user.role,
         is_active=True,
-        hashed_password=new_user.password,
+        hashed_password=bcrypt.hash(new_user.password),
     )
 
     return create_user_model
