@@ -1,12 +1,18 @@
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 from models import User
 from schemas import UserCreate
+from database import get_db
 
 router = APIRouter()
 
 bcrypt = CryptContext(schemes=["bcrypt"])
+
+DBDependency = Annotated[Session, Depends(get_db)]
 
 
 @router.get("/auth")
@@ -18,11 +24,11 @@ async def get_user():
 
 
 @router.post("/users")
-async def create_user(new_user: UserCreate):
+async def create_user(new_user: UserCreate, db: DBDependency):
     """
     Create user
     """
-    create_user_model = User(
+    user = User(
         username=new_user.username,
         email=new_user.email,
         first_name=new_user.first_name,
@@ -32,4 +38,8 @@ async def create_user(new_user: UserCreate):
         hashed_password=bcrypt.hash(new_user.password),
     )
 
-    return create_user_model
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return JSONResponse(status_code=201, content={"status": "Success"})
