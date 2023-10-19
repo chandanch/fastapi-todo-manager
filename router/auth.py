@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from starlette import status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
@@ -42,4 +43,6 @@ async def create_user(new_user: UserCreate, db: DBDependency):
     db.commit()
     db.refresh(user)
 
-    return JSONResponse(status_code=201, content={"status": "Success"})
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED, content={"status": "Success"}
+    )
