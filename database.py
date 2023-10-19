@@ -32,7 +32,7 @@ from sqlalchemy.ext.declarative import declarative_base
 # By subclassing Base, your model classes inherit useful attributes and methods for interacting with the database.
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./todo.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./todomanager.db"
 
 db_engine = create_engine(
     url=SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
