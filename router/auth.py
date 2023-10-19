@@ -15,6 +15,9 @@ async def get_user():
 
 @router.post("/users")
 async def create_user(new_user: UserCreate):
+    """
+    Create user
+    """
     create_user_model = User(
         username=new_user.username,
         email=new_user.email,
