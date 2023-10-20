@@ -1,6 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+
 from starlette import status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -16,12 +18,13 @@ bcrypt = CryptContext(schemes=["bcrypt"])
 DBDependency = Annotated[Session, Depends(get_db)]
 
 
-@router.get("/auth")
-async def get_user():
+@router.post("/auth")
+async def authenticate(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     """
     Auth User
     """
-    return {"user": "authenticated"}
+
+    return {"user": form_data}
 
 
 @router.post("/users")

@@ -8,6 +8,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 fastapi = "*"
 sqlalchemy = "*"
 passlib = {extras = ["bcrypt"], version = "*"}
+python-multipart = "*"
 
 [dev-packages]
 
