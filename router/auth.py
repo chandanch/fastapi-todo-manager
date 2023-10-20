@@ -20,6 +20,9 @@ DBDependency = Annotated[Session, Depends(get_db)]
 
 
 def authenticate_user(username: str, password: str, db):
+    """
+    authenticate user and check user existence
+    """
     user = db.query(User).filter(User.username == username).first()
     if not user:
         return False
