@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from starlette import status
@@ -18,11 +19,34 @@ bcrypt = CryptContext(schemes=["bcrypt"])
 DBDependency = Annotated[Session, Depends(get_db)]
 
 
+def authenticate_user(username: str, password: str, db):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        return False
+    if not bcrypt.verify(password, user.hashed_password):
+        return False
+    else:
+        return True
+
+
 @router.post("/auth")
-async def authenticate(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def authenticate(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DBDependency
+):
     """
     Auth User
     """
+    is_valid_user = authenticate_user(form_data.username, form_data.password, db)
+
+    if is_valid_user:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK, content={"status": "Success"}
+        )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "invalid credentials"},
+        )
 
     return {"user": form_data}
 
