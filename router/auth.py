@@ -1,4 +1,11 @@
+"""
+Auth Routes
+"""
+
 from typing import Annotated
+from datetime import timedelta, datetime
+
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
@@ -8,7 +15,6 @@ from starlette import status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from jose import jwt
-from datetime import timedelta, datetime
 
 from models import User
 from schemas import UserCreate, AuthResponse
@@ -39,6 +45,9 @@ def authenticate_user(username: str, password: str, db):
 
 
 def generate_token(user: User, time_delta: timedelta):
+    """
+    Generate JWT token
+    """
     token_payload = {
         "username": user.username,
         "role": user.role,
