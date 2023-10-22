@@ -9,12 +9,12 @@ from datetime import timedelta, datetime
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from starlette import status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from jose import jwt
+from jose import jwt, JWTError
 
 from models import User
 from schemas import UserCreate, AuthResponse
@@ -29,6 +29,8 @@ DBDependency = Annotated[Session, Depends(get_db)]
 JWT_KEY = "weneqweqwuhu3hhu32erh3rf32fh"
 
 JWT_SIGN_ALG = "HS256"
+
+oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth")
 
 
 def authenticate_user(username: str, password: str, db):
@@ -61,6 +63,25 @@ def generate_token(user: User, time_delta: timedelta):
         algorithm=JWT_SIGN_ALG,
         key=JWT_KEY,
     )
+
+
+async def verify_token(token: Annotated[str, Depends(oauth_bearer)]):
+    try:
+        payload = jwt.decode(token, key=JWT_KEY, algorithms=[JWT_SIGN_ALG])
+        username: str = payload.get("username")
+        role: str = payload.get("role")
+
+        if username is None or role is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={"msg": "Invalid token"},
+            )
+        else:
+            return {"username": username, "role": role}
+    except JWTError as exp:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail={"msg": "Invalid token"}
+        ) from exp
 
 
 @router.post("/auth", response_model=AuthResponse)
