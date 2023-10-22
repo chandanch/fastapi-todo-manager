@@ -11,7 +11,7 @@ from jose import jwt
 from datetime import timedelta, datetime
 
 from models import User
-from schemas import UserCreate
+from schemas import UserCreate, AuthResponse
 from database import get_db
 
 router = APIRouter()
@@ -54,7 +54,7 @@ def generate_token(user: User, time_delta: timedelta):
     )
 
 
-@router.post("/auth")
+@router.post("/auth", response_model=AuthResponse)
 async def authenticate(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DBDependency
 ):

@@ -15,3 +15,8 @@ class UserCreate(BaseModel):
     last_name: str = Field(min_length=2)
     password: str
     role: str = Field(min_length=3)
+
+
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str
