@@ -51,8 +51,6 @@ async def authenticate(
             detail={"msg": "invalid credentials"},
         )
 
-    return {"user": form_data}
-
 
 @router.post("/users")
 async def create_user(new_user: UserCreate, db: DBDependency):
