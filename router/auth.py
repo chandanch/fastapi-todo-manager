@@ -7,6 +7,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+from jose import jwt
+from datetime import timedelta, datetime
 
 from models import User
 from schemas import UserCreate
@@ -17,6 +19,10 @@ router = APIRouter()
 bcrypt = CryptContext(schemes=["bcrypt"])
 
 DBDependency = Annotated[Session, Depends(get_db)]
+
+JWT_KEY = "weneqweqwuhu3hhu32erh3rf32fh"
+
+JWT_SIGN_ALG = "HS256"
 
 
 def authenticate_user(username: str, password: str, db):
@@ -29,7 +35,23 @@ def authenticate_user(username: str, password: str, db):
     if not bcrypt.verify(password, user.hashed_password):
         return False
     else:
-        return True
+        return user
+
+
+def generate_token(user: User, time_delta: timedelta):
+    token_payload = {
+        "username": user.username,
+        "role": user.role,
+        "sub": user.username,
+        "aud": "todomanager",
+        "exp": datetime.utcnow() + time_delta,
+    }
+
+    return jwt.encode(
+        token_payload,
+        algorithm=JWT_SIGN_ALG,
+        key=JWT_KEY,
+    )
 
 
 @router.post("/auth")
@@ -39,17 +61,20 @@ async def authenticate(
     """
     Auth User
     """
-    is_valid_user = authenticate_user(form_data.username, form_data.password, db)
+    user = authenticate_user(form_data.username, form_data.password, db)
 
-    if is_valid_user:
+    if user:
         return JSONResponse(
-            status_code=status.HTTP_200_OK, content={"status": "Success"}
+            status_code=status.HTTP_200_OK,
+            content={
+                "access_token": generate_token(user, timedelta(minutes=60)),
+                "token_type": "Bearer",
+            },
         )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"msg": "invalid credentials"},
-        )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail={"msg": "invalid credentials"},
+    )
 
 
 @router.post("/users")
