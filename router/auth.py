@@ -20,7 +20,10 @@ from models import User
 from schemas import UserCreate, AuthResponse
 from database import get_db
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Auth APIs"],
+    prefix="/auth",
+)
 
 bcrypt = CryptContext(schemes=["bcrypt"])
 
@@ -30,7 +33,7 @@ JWT_KEY = "weneqweqwuhu3hhu32erh3rf32fh"
 
 JWT_SIGN_ALG = "HS256"
 
-oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth")
+oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 def authenticate_user(username: str, password: str, db):
@@ -66,6 +69,9 @@ def generate_token(user: User, time_delta: timedelta):
 
 
 async def verify_token(token: Annotated[str, Depends(oauth_bearer)]):
+    """
+    Verify token
+    """
     try:
         payload = jwt.decode(token, key=JWT_KEY, algorithms=[JWT_SIGN_ALG])
         username: str = payload.get("username")
@@ -84,12 +90,12 @@ async def verify_token(token: Annotated[str, Depends(oauth_bearer)]):
         ) from exp
 
 
-@router.post("/auth", response_model=AuthResponse)
-async def authenticate(
+@router.post("/token", response_model=AuthResponse)
+async def get_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DBDependency
 ):
     """
-    Auth User
+    Login User & Get Token
     """
     user = authenticate_user(form_data.username, form_data.password, db)
 
