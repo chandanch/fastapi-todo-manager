@@ -2,6 +2,10 @@ from pydantic import BaseModel, Field
 
 
 class TodoCreate(BaseModel):
+    """
+    Create Todo Request Schema
+    """
+
     title: str = Field(min_length=3)
     description: str = Field(min_length=3, max_length=100)
     priority: int = Field(gt=0, lt=6)
@@ -9,6 +13,10 @@ class TodoCreate(BaseModel):
 
 
 class UserCreate(BaseModel):
+    """
+    Create User Request Schema
+    """
+
     username: str = Field(min_length=3)
     email: str
     first_name: str = Field(min_length=2)
@@ -18,5 +26,9 @@ class UserCreate(BaseModel):
 
 
 class AuthResponse(BaseModel):
+    """
+    Auth Response Schema
+    """
+
     access_token: str
     token_type: str
