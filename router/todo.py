@@ -1,3 +1,7 @@
+"""
+Todo Routes
+"""
+
 from typing import Annotated
 from fastapi import Depends, APIRouter, Path, status
 from fastapi.responses import JSONResponse
