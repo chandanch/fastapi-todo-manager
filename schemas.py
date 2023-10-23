@@ -1,3 +1,7 @@
+"""
+Pydantic Schemas
+"""
+
 from pydantic import BaseModel, Field
 
 
