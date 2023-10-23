@@ -10,7 +10,7 @@ from models import Todo
 from schemas import TodoCreate
 
 
-router = APIRouter()
+router = APIRouter(tags=["Todos API"])
 
 DBDependency = Annotated[Session, Depends(get_db)]
 
