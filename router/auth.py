@@ -33,7 +33,7 @@ JWT_KEY = "weneqweqwuhu3hhu32erh3rf32fh"
 
 JWT_SIGN_ALG = "HS256"
 
-oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 def authenticate_user(username: str, password: str, db):
@@ -59,6 +59,7 @@ def generate_token(user: User, time_delta: timedelta):
         "sub": user.username,
         "aud": "todomanager",
         "exp": datetime.utcnow() + time_delta,
+        "id": user.id,
     }
 
     return jwt.encode(
@@ -68,23 +69,28 @@ def generate_token(user: User, time_delta: timedelta):
     )
 
 
-async def verify_token(token: Annotated[str, Depends(oauth_bearer)]):
+async def get_user_info(token: Annotated[str, Depends(oauth_bearer)]):
     """
-    Verify token
+    Authorize User by decoding jwt token
     """
     try:
-        payload = jwt.decode(token, key=JWT_KEY, algorithms=[JWT_SIGN_ALG])
+        print(token)
+        payload = jwt.decode(
+            token, key=JWT_KEY, algorithms=[JWT_SIGN_ALG], audience="todomanager"
+        )
         username: str = payload.get("username")
         role: str = payload.get("role")
+        user_id: int = payload.get("id")
 
         if username is None or role is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail={"msg": "Invalid token"},
+                detail={"msg": "Invalid token, User not found"},
             )
         else:
-            return {"username": username, "role": role}
+            return {"username": username, "role": role, "id": user_id}
     except JWTError as exp:
+        print(exp)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"msg": "Invalid token"}
         ) from exp

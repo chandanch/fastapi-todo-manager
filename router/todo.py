@@ -12,11 +12,14 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Todo
 from schemas import TodoCreate
+from .auth import get_user_info
 
 
 router = APIRouter(tags=["Todos API"])
 
 DBDependency = Annotated[Session, Depends(get_db)]
+
+UserInfoDependency = Annotated[dict, Depends(get_user_info)]
 
 
 @router.get("/todos", status_code=status.HTTP_200_OK)
@@ -45,11 +48,19 @@ async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
 
 
 @router.post("/todos")
-async def create_todo(db: DBDependency, todo_request: TodoCreate):
+async def create_todo(
+    user: UserInfoDependency, db: DBDependency, todo_request: TodoCreate
+):
     """
     Create todo item
     """
-    todo = Todo(**todo_request.model_dump())
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "Authentication Failed"},
+        )
+    print(user)
+    todo = Todo(**todo_request.model_dump(), owner_id=user.get("id"))
 
     db.add(todo)
     db.commit()

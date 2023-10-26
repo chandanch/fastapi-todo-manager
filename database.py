@@ -51,4 +51,5 @@ def get_db():
         db = SessionLocal()
         yield db
     finally:
+        print("DB Connection closed")
         db.close()
