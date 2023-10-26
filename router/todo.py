@@ -23,11 +23,11 @@ UserInfoDependency = Annotated[dict, Depends(get_user_info)]
 
 
 @router.get("/todos", status_code=status.HTTP_200_OK)
-async def get_todos(db: DBDependency):
+async def get_todos(user: UserInfoDependency, db: DBDependency):
     """
     Get Todos
     """
-    return db.query(Todo).all()
+    return db.query(Todo).filter(Todo.owner_id == user.get("id")).all()
 
 
 @router.get("/todos/{todo_id}")
