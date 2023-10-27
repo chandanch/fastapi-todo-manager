@@ -27,6 +27,11 @@ async def get_todos(user: UserInfoDependency, db: DBDependency):
     """
     Get Todos
     """
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "Authentication Failed"},
+        )
     return db.query(Todo).filter(Todo.owner_id == user.get("id")).all()
 
 
