@@ -153,11 +153,11 @@ async def delete_todo(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"error": f"Todo with {todo_id} not found"},
         )
-    else:
-        db.query(Todo).filter(Todo.id == todo_id).filter(
-            Todo.owner_id == user.get("id")
-        ).delete()
-        db.commit()
+
+    db.query(Todo).filter(Todo.id == todo_id).filter(
+        Todo.owner_id == user.get("id")
+    ).delete()
+    db.commit()
 
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"status": "Deleted Successfully"}
