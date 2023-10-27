@@ -130,11 +130,23 @@ async def update_todo(
 
 
 @router.delete("/todos/{todo_id}")
-async def delete_todo(db: DBDependency, todo_id: int = Path(gt=0)):
+async def delete_todo(
+    user: UserInfoDependency, db: DBDependency, todo_id: int = Path(gt=0)
+):
     """
     Delete todo item
     """
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "Authentication Failed"},
+        )
+    todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.owner_id == user.get("id"))
+        .first()
+    )
 
     if todo is None:
         raise HTTPException(
@@ -142,7 +154,9 @@ async def delete_todo(db: DBDependency, todo_id: int = Path(gt=0)):
             detail={"error": f"Todo with {todo_id} not found"},
         )
     else:
-        db.query(Todo).filter(Todo.id == todo_id).delete()
+        db.query(Todo).filter(Todo.id == todo_id).filter(
+            Todo.owner_id == user.get("id")
+        ).delete()
         db.commit()
 
     return JSONResponse(
