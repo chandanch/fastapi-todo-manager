@@ -11,7 +11,7 @@ app = FastAPI(
     description="Todo API helps you manage awesome todos. 🚀",
     version="1.1.0",
     contact={"name": "chandanch"},
-    summary="Mange Todos Easily",
+    summary="Manage Todos Easily",
 )
 
 
