@@ -36,20 +36,31 @@ async def get_todos(user: UserInfoDependency, db: DBDependency):
 
 
 @router.get("/todos/{todo_id}")
-async def get_todo_by_id(db: DBDependency, todo_id: int = Path(gt=0)):
+async def get_todo_by_id(
+    user: UserInfoDependency, db: DBDependency, todo_id: int = Path(gt=0)
+):
     """
     Get Todo By ID
     """
-    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "Authentication Failed"},
+        )
+    todo = (
+        db.query(Todo)
+        .filter(Todo.id == todo_id)
+        .filter(Todo.owner_id == user.get("id"))
+        .first()
+    )
     if todo is not None:
         return JSONResponse(
             status_code=status.HTTP_200_OK, content=jsonable_encoder(todo)
         )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": f"Todo with {todo_id} not found"},
-        )
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail={"error": f"Todo with {todo_id} not found"},
+    )
 
 
 @router.post("/todos")
