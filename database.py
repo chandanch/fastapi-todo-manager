@@ -1,7 +1,7 @@
 """
 Database initializer and session manager
 """
-
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -32,11 +32,10 @@ from sqlalchemy.ext.declarative import declarative_base
 # By subclassing Base, your model classes inherit useful attributes and methods for interacting with the database.
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./todomanager.db"
+SQLALCHEMY_DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
 
-db_engine = create_engine(
-    url=SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+
+db_engine = create_engine(url=SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autoflush=True, bind=db_engine, autocommit=False)
 

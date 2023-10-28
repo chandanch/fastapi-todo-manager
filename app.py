@@ -2,8 +2,11 @@
 App
 """
 from fastapi import FastAPI
+from dotenv import load_dotenv
 
 from router import auth, healthcheck, todo, admin
+
+load_dotenv()
 
 
 app = FastAPI(
