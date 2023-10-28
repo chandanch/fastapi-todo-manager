@@ -31,7 +31,7 @@ class Todo(Base):
     description = Column(String)
     priority = Column(Integer)
     is_complete = Column(Boolean, default=False)
-    owner_id = Column(Integer, ForeignKey("user.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
 
 
 # create database and tables
