@@ -6,7 +6,7 @@ from typing import Annotated
 from datetime import timedelta, datetime
 
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -69,12 +69,11 @@ def generate_token(user: User, time_delta: timedelta):
     )
 
 
-async def get_user_info(token: Annotated[str, Depends(oauth_bearer)]):
+async def get_user_info(request: Request, token: Annotated[str, Depends(oauth_bearer)]):
     """
     Authorize User by decoding jwt token
     """
     try:
-        print(token)
         payload = jwt.decode(
             token, key=JWT_KEY, algorithms=[JWT_SIGN_ALG], audience="todomanager"
         )
@@ -85,15 +84,44 @@ async def get_user_info(token: Annotated[str, Depends(oauth_bearer)]):
         if username is None or role is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail={"msg": "Invalid token, User not found"},
+                detail={"msg": "Invalid token"},
             )
         else:
-            return {"username": username, "role": role, "id": user_id}
+            user_info = {"username": username, "role": role, "id": user_id}
+            request.state.user_info = user_info
+            return user_info
     except JWTError as exp:
         print(exp)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"msg": "Invalid token"}
         ) from exp
+
+
+async def authorize_request(request: Request):
+    """
+    Authorize request
+    """
+    user_info = request.state.user_info
+    print("Auth Req", user_info, request.state)
+    if user_info is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"msg": "Invalid Token"},
+        )
+    user_role: str = user_info.get("role")
+
+    if user_role is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"msg": "Insufficient Permission"},
+        )
+
+    if user_role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"msg": "Insufficient Permission"},
+        )
+    return True
 
 
 @router.post("/token", response_model=AuthResponse)
