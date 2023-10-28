@@ -7,7 +7,7 @@ class User(Base):
     User Table
     """
 
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, unique=True)
@@ -24,7 +24,7 @@ class Todo(Base):
     Class for todos
     """
 
-    __tablename__ = "todo"
+    __tablename__ = "todos"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String)
