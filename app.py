@@ -3,7 +3,7 @@ App
 """
 from fastapi import FastAPI
 
-from router import auth, healthcheck, todo
+from router import auth, healthcheck, todo, admin
 
 
 app = FastAPI(
@@ -18,3 +18,4 @@ app = FastAPI(
 app.include_router(router=auth.router)
 app.include_router(router=healthcheck.router)
 app.include_router(router=todo.router)
+app.include_router(router=admin.router)
