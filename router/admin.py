@@ -23,6 +23,7 @@ DBDependency = Annotated[Session, Depends(get_db)]
 async def get_todos_admin(
     user: UserInfoDependency, aut: AuthorizeUserDependency, db: DBDependency
 ):
+    """Get Todo admin"""
     print(user, aut)
     todos = db.query(Todo).all()
     return JSONResponse(status_code=200, content=jsonable_encoder(todos))
@@ -30,6 +31,8 @@ async def get_todos_admin(
 
 @router.post("/todos")
 async def create_todo_admin(
-    user: UserInfoDependency, auth: AuthorizeUserDependency, todo: TodoCreate
+    _: UserInfoDependency, __: AuthorizeUserDependency, todo: TodoCreate
 ):
+    """Create todo admin"""
+    # print(user, auth)
     return todo
