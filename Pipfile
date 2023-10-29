@@ -12,6 +12,7 @@ python-multipart = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 psycopg2-binary = "*"
 python-dotenv = "*"
+alembic = "*"
 
 [dev-packages]
 
