@@ -34,6 +34,7 @@ class Todo(Base):
     is_complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
     category = Column(String, nullable=True)
+    todo_type = Column(String, nullable=True)
 
 
 # create database and tables

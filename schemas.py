@@ -15,6 +15,7 @@ class TodoCreate(BaseModel):
     priority: int = Field(gt=0, lt=6)
     is_complete: bool
     category: str = Field(min_length=3)
+    todo_type: str = Field(min_length=2)
 
 
 class UserCreate(BaseModel):
