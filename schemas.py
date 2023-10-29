@@ -14,6 +14,7 @@ class TodoCreate(BaseModel):
     description: str = Field(min_length=3, max_length=100)
     priority: int = Field(gt=0, lt=6)
     is_complete: bool
+    category: str = Field(min_length=3)
 
 
 class UserCreate(BaseModel):
@@ -27,6 +28,7 @@ class UserCreate(BaseModel):
     last_name: str = Field(min_length=2)
     password: str
     role: str = Field(min_length=3)
+    phone_number: str = Field(min_length=3)
 
 
 class AuthResponse(BaseModel):
