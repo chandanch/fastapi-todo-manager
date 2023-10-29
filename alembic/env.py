@@ -22,7 +22,7 @@ fileConfig(config.config_file_name)
 # Get the database URL from the environment variable
 database_url = os.getenv("SQLALCHEMY_DATABASE_URL")
 
-# Update the Alembic configuration with the database URL
+# Update the Alembic configuration with the needed database URL
 config.set_main_option("sqlalchemy.url", database_url)
 
 # add your model's MetaData object here

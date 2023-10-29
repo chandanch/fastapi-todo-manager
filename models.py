@@ -17,6 +17,7 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
     role = Column(String)
+    phone_number = Column(String, nullable=True)
 
 
 class Todo(Base):
@@ -32,6 +33,7 @@ class Todo(Base):
     priority = Column(Integer)
     is_complete = Column(Boolean, default=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
+    category = Column(String, nullable=True)
 
 
 # create database and tables
