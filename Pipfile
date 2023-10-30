@@ -13,6 +13,7 @@ python-jose = {extras = ["cryptography"], version = "*"}
 psycopg2-binary = "*"
 python-dotenv = "*"
 alembic = "*"
+pipenv-to-requirements = "*"
 
 [dev-packages]
 
