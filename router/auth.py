@@ -6,7 +6,7 @@ from typing import Annotated
 from datetime import timedelta, datetime
 
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -126,7 +126,9 @@ async def authorize_request(request: Request):
 
 @router.post("/token", response_model=AuthResponse)
 async def get_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: DBDependency
+    response: Response,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: DBDependency,
 ):
     """
     Login User & Get Token
@@ -134,10 +136,12 @@ async def get_token(
     user = authenticate_user(form_data.username, form_data.password, db)
 
     if user:
+        access_token = generate_token(user, timedelta(minutes=60))
+        response.set_cookie(key="access_token", value=access_token)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
-                "access_token": generate_token(user, timedelta(minutes=60)),
+                "access_token": access_token,
                 "token_type": "Bearer",
             },
         )
